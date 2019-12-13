@@ -46,7 +46,7 @@ public class Courier implements Serializable {
   @Column(name = VEHICLE_NUMBER)
   private String vehicleNumber;
   @Column(name = ADDRESS)
-  private String Address;
+  private String address;
 
   @Override
   public String toString() {
@@ -56,7 +56,7 @@ public class Courier implements Serializable {
     sb.append(", email='").append(email).append('\'');
     sb.append(", phoneNumber='").append(phoneNumber).append('\'');
     sb.append(", vehicleNumber='").append(vehicleNumber).append('\'');
-    sb.append(", Address='").append(Address).append('\'');
+    sb.append(", Address='").append(address).append('\'');
     sb.append('}');
     return sb.toString();
   }
