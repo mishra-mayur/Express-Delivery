@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -34,6 +35,9 @@ public class LiveCourier implements Serializable {
   @GenericGenerator(name = "system-uuid", strategy = "uuid2")
   @Column(name = ID)
   private String id;
+
+  @OneToOne
+  private Courier courier;
   private GeoLocation courierLocation;
   private TripStatus status;
 
