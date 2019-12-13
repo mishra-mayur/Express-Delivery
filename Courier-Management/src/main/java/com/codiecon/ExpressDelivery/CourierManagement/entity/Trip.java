@@ -22,7 +22,7 @@ public class Trip  implements Serializable {
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid2")
   @Column(name = ID)
-  private long id;
+  private String id;
   @Column(name = "courier_id")
   private long courierId;
   @Column(name = "weight")

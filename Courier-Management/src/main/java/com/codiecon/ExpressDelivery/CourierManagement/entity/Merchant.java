@@ -28,7 +28,7 @@ public class Merchant implements Serializable {
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid2")
   @Column(name = ID)
-  private long id;
+  private String id;
   @Column(name = NAME)
   private String name;
   @Column(name = EMAIL)

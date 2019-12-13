@@ -1,11 +1,8 @@
 package com.codiecon.ExpressDelivery.CourierManagement.repository;
 
-import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
+import com.codiecon.ExpressDelivery.CourierManagement.entity.Merchant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BookingRequestRepository extends JpaRepository<BookingRequest, String> {
-
-
-}
+public interface MerchantRepository extends JpaRepository<Merchant, String> {}

@@ -7,8 +7,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -23,8 +27,13 @@ public class LiveCourier implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public static final String LIVE_COURIER = "live_courier";
+  private static final String ID = "ID";
 
-  private long id;
+  @Id
+  @GeneratedValue(generator = "system-uuid")
+  @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+  @Column(name = ID)
+  private String id;
   private GeoLocation courierLocation;
   private TripStatus status;
 
