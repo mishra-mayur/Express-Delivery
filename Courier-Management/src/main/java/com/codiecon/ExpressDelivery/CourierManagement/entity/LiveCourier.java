@@ -35,9 +35,7 @@ public class LiveCourier implements Serializable {
   @GenericGenerator(name = "system-uuid", strategy = "uuid2")
   @Column(name = ID)
   private String id;
-
-  @OneToOne
-  private Courier courier;
+  private String courierId;
   private GeoLocation courierLocation;
   private TripStatus status;
 

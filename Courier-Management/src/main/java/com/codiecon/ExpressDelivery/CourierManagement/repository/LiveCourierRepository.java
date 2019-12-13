@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface LiveCourierRepository extends JpaRepository<LiveCourier,String> {}
+public interface LiveCourierRepository extends JpaRepository<LiveCourier,String> {
+
+}
