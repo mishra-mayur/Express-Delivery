@@ -28,5 +28,5 @@ public class Trip  implements Serializable {
   @Column(name = "weight")
   private double weight;
   @Column(name = "shipment_id")
-  private long shipmentId;
+  private String shipmentId;
 }
