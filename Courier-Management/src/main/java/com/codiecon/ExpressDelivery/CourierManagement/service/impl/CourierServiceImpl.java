@@ -43,9 +43,9 @@ public class CourierServiceImpl implements CourierService {
       courier.setPassword(encryptedPassword);
       courier.setStatus(CourierStatus.OTP_NOT_VERIFIED);
       String otp = String.format("%04d", random.nextInt(10000));
+      courier.setOtp(otp);
       courierRepository.save(courier);
       mailSenderService.sendMail(courier.getEmail(),otp);
-      courier.setOtp(otp);
       return true;
     } catch (Exception e) {
       return false;
