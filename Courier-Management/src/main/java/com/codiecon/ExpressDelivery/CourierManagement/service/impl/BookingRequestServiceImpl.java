@@ -1,6 +1,6 @@
 package com.codiecon.ExpressDelivery.CourierManagement.service.impl;
 
-import com.codiecon.ExpressDelivery.CourierManagement.Enum.TripStatus;
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.LiveCourier;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.BookingRequestRepository;
@@ -46,7 +46,7 @@ public class BookingRequestServiceImpl implements BookingRequestService {
     while (!isCourierFetched) {
 
       List<LiveCourier> liveCouriers = liveCourierService
-          .findLiveCouriersNearBy(TripStatus.ACTIVE, courierFetchMinDistance,
+          .findLiveCouriersNearBy(CourierStatus.ACTIVE, courierFetchMinDistance,
               bookingRequest.getPickupLocation(), bookingRequest.getLocationName());
 
       // send notification to these live couriers async

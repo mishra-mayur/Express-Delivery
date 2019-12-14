@@ -11,10 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface MerchantRepository extends JpaRepository<Merchant, String> {
 
   Merchant findByEmail(String email);
-  void deleteByEmail(String email);
   void deleteAllByEmail(String email);
-  @Modifying
-  @Query(value = "DELETE FROM Merchant M WHERE M.email = :email")
-  void deleteMerchantByEmail(@Param("email") String email);
 }
 

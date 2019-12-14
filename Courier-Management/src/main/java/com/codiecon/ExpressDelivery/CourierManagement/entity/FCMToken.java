@@ -1,6 +1,8 @@
 package com.codiecon.ExpressDelivery.CourierManagement.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -8,26 +10,26 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name = Trip.TRIP)
-public class Trip  implements Serializable {
-  private static final long serialVersionUID = 1L;
-  public static final String TRIP = "trip";
-  private static final String ID = "ID";
+@Table(name = FCMToken.FCM_TOKEN)
+public class FCMToken {
+  public static final String FCM_TOKEN = "fcmToken";
+  public static final String ID = "id";
 
   @Id
   @GeneratedValue(generator = "system-uuid")
   @GenericGenerator(name = "system-uuid", strategy = "uuid2")
   @Column(name = ID)
   private String id;
-  @Column(name = "courier_id")
-  private long courierId;
-  @Column(name = "weight")
-  private double weight;
-  @Column(name = "booking_id")
-  private String bookingId;
+  @Column(name = "email")
+  private String email;
+  @Column(name = "fcmToken")
+  private String FcmToken;
 
+  public FCMToken(String email, String fcmToken) {
+    this.email = email;
+    FcmToken = fcmToken;
+  }
 }

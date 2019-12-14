@@ -55,7 +55,7 @@ public class MerchantController {
   }
 
   @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BaseSingleResponse<Merchant> getHubGroup(@RequestParam(EMAIL) String email) {
+  public BaseSingleResponse<Merchant> getMerchant(@RequestParam(EMAIL) String email) {
     log.info("request for fetching Merchant");
     return new BaseSingleResponse(true, HttpStatus.OK.value(), merchantService.getMerchantByEmail(email));
   }
