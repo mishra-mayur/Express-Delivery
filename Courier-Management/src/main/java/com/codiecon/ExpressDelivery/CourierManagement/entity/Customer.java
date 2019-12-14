@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Table(name = Customer.CUSTOMERS)
 public class Customer implements Serializable {
   private static final long serialVersionUID = 1L;
-  public static final String CUSTOMERS = "customers";
+  public static final String CUSTOMERS = "customer";
   private static final String ID = "ID";
   private static final String NAME = "NAME";
   private static final String EMAIL = "EMAIL";

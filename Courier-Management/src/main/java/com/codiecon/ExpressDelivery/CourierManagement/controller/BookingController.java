@@ -29,8 +29,8 @@ public class BookingController {
   private BookingRequestService bookingService;
 
 
-  @RequestMapping(method = {RequestMethod.GET}, produces = {MediaType.APPLICATION_JSON_VALUE})
-  public BaseListResponse<BookingRequest> getBookingRequestsBy(@RequestParam String customerId)
+  @RequestMapping(method = {RequestMethod.GET})
+  public BaseListResponse<BookingRequest> getBookingRequestsByCustomerId(@RequestParam String customerId)
       throws Exception {
     List<BookingRequest> bookingRequests = bookingService.getBookingRequestByCusotmerId(customerId);
     return new BaseListResponse<BookingRequest>(true, HttpStatus.OK.value(), bookingRequests);
@@ -42,6 +42,14 @@ public class BookingController {
     bookingService.saveBookingRequest(bookingRequest);
     return new BaseResponse(true, HttpStatus.OK.value());
   }
+
+  @RequestMapping(method = {RequestMethod.POST} , value = "/trip")
+  public BaseResponse bookTrip(@RequestBody BookingRequest bookingRequest) throws Exception {
+    bookingService.bookTrip(bookingRequest);
+    return new BaseResponse(true, HttpStatus.OK.value());
+  }
+
+
 
 
 }

@@ -9,4 +9,6 @@ public interface BookingRequestService {
   void saveBookingRequest(BookingRequest bookingRequest);
 
   List<BookingRequest> getBookingRequestByCusotmerId(String customerId);
+
+  void bookTrip(BookingRequest bookingRequest);
 }
