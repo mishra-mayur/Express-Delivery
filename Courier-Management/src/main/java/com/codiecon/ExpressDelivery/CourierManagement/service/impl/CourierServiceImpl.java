@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -34,21 +35,21 @@ public class CourierServiceImpl implements CourierService {
 
   @Override
   public boolean signUp(Courier courier) {
-    String encryptedPassword = passwordEncryption.encrypt(courier.getPassword());
-    if (encryptedPassword == null) {
+    try {
+      String encryptedPassword = passwordEncryption.encrypt(courier.getPassword());
+      if (encryptedPassword == null) {
+        return false;
+      }
+      courier.setPassword(encryptedPassword);
+      courier.setStatus(CourierStatus.OTP_NOT_VERIFIED);
+      String otp = String.format("%04d", random.nextInt(10000));
+      courierRepository.save(courier);
+      mailSenderService.sendMail(courier.getEmail(),otp);
+      courier.setOtp(otp);
+      return true;
+    } catch (Exception e) {
       return false;
     }
-    courier.setPassword(encryptedPassword);
-    courier.setStatus(CourierStatus.OTP_NOT_VERIFIED);
-    String otp = String.format("%04d", random.nextInt(10000));
-    //TODO
-    /*
-    Send OTP verification mail
-     */
-    mailSenderService.sendMail(courier.getEmail(),otp);
-    courier.setOtp(otp);
-    courierRepository.save(courier);
-    return true;
   }
 
   @Override
@@ -81,10 +82,12 @@ public class CourierServiceImpl implements CourierService {
   @Override
   public boolean signIn(SignInVo signInVo) {
     Courier courier = courierRepository.getCourierByEmail(signInVo.getEmail());
-    String encryptedPassword = passwordEncryption.encrypt(signInVo.getPassword());
-    if (encryptedPassword.equals(courier.getPassword())){
-      fcmTokenService.save(signInVo.getEmail(),signInVo.getFcmToken());
-      return true;
+    if (Objects.nonNull(courier)) {
+      String encryptedPassword = passwordEncryption.encrypt(signInVo.getPassword());
+      if (encryptedPassword.equals(courier.getPassword())){
+        fcmTokenService.save(signInVo.getEmail(),signInVo.getFcmToken());
+        return true;
+      }
     }
     return false;
   }
