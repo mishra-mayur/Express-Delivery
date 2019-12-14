@@ -9,11 +9,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name = Merchant.MERCHANT)
+@Table(name = Merchant.MERCHANT,uniqueConstraints={@UniqueConstraint(columnNames = {"email"})})
 public class Merchant implements Serializable {
   private static final long serialVersionUID = 1L;
   public static final String MERCHANT = "merchant";
@@ -32,6 +34,7 @@ public class Merchant implements Serializable {
   @Column(name = NAME)
   private String name;
   @Column(name = EMAIL)
+  @NotNull
   private String email;
   @Column(name = PHONE_NUMBER)
   private String phoneNumber;
