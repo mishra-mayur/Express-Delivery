@@ -6,12 +6,15 @@ import com.codiecon.ExpressDelivery.CourierManagement.entity.LiveCourier;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.BookingRequestRepository;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingRequestService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.DistanceService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.FcmTokenService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.LiveCourierService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.PushNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingRequestServiceImpl implements BookingRequestService {
@@ -27,6 +30,12 @@ public class BookingRequestServiceImpl implements BookingRequestService {
 
   @Autowired
   private LiveCourierService liveCourierService;
+
+  @Autowired
+  private PushNotificationService pushNotificationService;
+
+  @Autowired
+  private FcmTokenService fcmTokenService;
 
   @Override
   public void saveBookingRequest(BookingRequest bookingRequest) {
@@ -48,11 +57,11 @@ public class BookingRequestServiceImpl implements BookingRequestService {
       List<LiveCourier> liveCouriers = liveCourierService
           .findLiveCouriersNearBy(CourierStatus.ACTIVE, courierFetchMinDistance,
               bookingRequest.getPickupLocation(), bookingRequest.getLocationName());
-
+      List<String> liveCourierIds =
+          liveCouriers.stream().map(LiveCourier::getId).collect(Collectors.toList());
+      List<String> liveCourierFcmTokens = fcmTokenService.getFcmTokenList(liveCourierIds);
       // send notification to these live couriers async
-
-
-
+      pushNotificationService.sendPushNotification(liveCourierFcmTokens);
     }
 
 

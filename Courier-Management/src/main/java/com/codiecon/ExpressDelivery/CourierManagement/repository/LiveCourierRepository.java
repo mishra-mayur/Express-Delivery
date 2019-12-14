@@ -25,6 +25,8 @@ public interface LiveCourierRepository extends JpaRepository<LiveCourier, String
       @Param("lonMax") double lonMax, @Param("lonMin") double lonMin);
 
   @Modifying
-  @Query(value = "UPDATE LiveCourier LC SET LC.latitude = :latitude , LC.longitude = :longitude  WHERE LC.courierId = :courierId")
-  void updateLiveLocation(@Param("courierId") String courierId,@Param("latitude") double latitude,@Param("longitude") double longitude);
+  @Query(value = "UPDATE LiveCourier LC SET LC.latitude = :latitude , LC.longitude = :longitude  "
+      + "WHERE LC.courierId = :courierId")
+  void updateLiveLocation(@Param("courierId") String courierId, @Param("latitude") double latitude,
+      @Param("longitude") double longitude);
 }

@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class FcmTokenServiceImpl implements FcmTokenService {
 
@@ -23,5 +26,17 @@ public class FcmTokenServiceImpl implements FcmTokenService {
   @Transactional
   public void deleteToken(String courierId, String fcmToken) {
     fcmTokenRepository.deleteToken(courierId, fcmToken);
+  }
+
+  @Override
+  public String getFcmToken(String email) {
+    return fcmTokenRepository.findFCMTokenByEmail(email);
+  }
+
+  @Override
+  public List<String> getFcmTokenList(List<String> courierIdList) {
+     List<FCMToken> list = fcmTokenRepository.findAllFCMTokenById(courierIdList);
+     List<String> listFcmTokens = list.stream().map(FCMToken::getFcmToken).collect(Collectors.toList());
+     return listFcmTokens;
   }
 }
