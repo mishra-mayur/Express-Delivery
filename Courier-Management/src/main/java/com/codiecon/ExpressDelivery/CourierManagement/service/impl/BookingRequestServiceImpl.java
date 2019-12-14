@@ -1,6 +1,6 @@
 package com.codiecon.ExpressDelivery.CourierManagement.service.impl;
 
-import com.codiecon.ExpressDelivery.CourierManagement.Enum.TripStatus;
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.LiveCourier;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.BookingRequestRepository;
@@ -43,7 +43,7 @@ public class BookingRequestServiceImpl implements BookingRequestService {
     saveBookingRequest(bookingRequest);
 
     List<LiveCourier> liveCouriers =
-        liveCourierService.findLiveCouriersByTripStatus(TripStatus.ACTIVE);
+        liveCourierService.findLiveCouriersByTripStatus(CourierStatus.ACTIVE);
     boolean isCourierFetched = false;
     while (!isCourierFetched) {
 

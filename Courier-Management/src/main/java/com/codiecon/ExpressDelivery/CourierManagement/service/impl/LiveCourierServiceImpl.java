@@ -1,6 +1,6 @@
 package com.codiecon.ExpressDelivery.CourierManagement.service.impl;
 
-import com.codiecon.ExpressDelivery.CourierManagement.Enum.TripStatus;
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.LiveCourier;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.LiveCourierRepository;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.LiveCourierService;
@@ -17,7 +17,7 @@ public class LiveCourierServiceImpl implements LiveCourierService {
   private LiveCourierRepository liveCourierRepository;
 
   @Override
-  public List<LiveCourier> findLiveCouriersByTripStatus(TripStatus tripStatus){
+  public List<LiveCourier> findLiveCouriersByTripStatus(CourierStatus courierStatus){
 //    return liveCourierRepository.findAllByTripStatus(tripStatus);
     return null;
   }

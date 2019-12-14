@@ -1,5 +1,6 @@
 package com.codiecon.ExpressDelivery.CourierManagement.entity;
 
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -38,15 +40,24 @@ public class Courier implements Serializable {
   @Column(name = ID)
   private String id;
   @Column(name = NAME)
+  @NotNull
   private String name;
-  @Column(name = EMAIL)
+  @Column(name = EMAIL,unique = true)
+  @NotNull
   private String email;
   @Column(name = PHONE_NUMBER)
   private String phoneNumber;
+  @NotNull
   @Column(name = VEHICLE_NUMBER)
   private String vehicleNumber;
   @Column(name = ADDRESS)
   private String address;
+  @Column(name = "password")
+  private String password;
+  @Column(name = "status")
+  private CourierStatus status;
+  @Column(name = "otp")
+  private String otp;
 
   @Override
   public String toString() {

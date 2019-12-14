@@ -1,5 +1,5 @@
 package com.codiecon.ExpressDelivery.CourierManagement.Enum;
 
 public enum  BookingStatus {
-  PENDING, IN_PROGRESS, DONE,  FAILED;
+  PENDING,COURIER_ASSIGNED, IN_PROGRESS, DONE,  FAILED;
 }
