@@ -32,4 +32,6 @@ public class BookingRequest implements Serializable {
   private GeoLocation deliveryLocation;
 
   private BookingStatus status;
+
+  private String locationName;
 }

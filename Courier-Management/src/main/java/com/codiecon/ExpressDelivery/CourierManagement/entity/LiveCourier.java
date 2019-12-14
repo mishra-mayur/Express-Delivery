@@ -34,7 +34,10 @@ public class LiveCourier implements Serializable {
   @Column(name = ID)
   private String id;
   private String courierId;
-  private GeoLocation courierLocation;
+//  private GeoLocation courierLocation;
+  private TripStatus status;
 
+  private double latitude;
+  private double longitude;
 
 }

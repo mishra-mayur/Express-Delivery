@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DistanceConstantRepository extends JpaRepository<DistanceConstant, String> {
 
+  DistanceConstant findByLocation(String location);
 
 
 }
