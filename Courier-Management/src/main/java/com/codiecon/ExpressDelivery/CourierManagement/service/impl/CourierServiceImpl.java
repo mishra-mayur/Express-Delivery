@@ -1,9 +1,12 @@
 package com.codiecon.ExpressDelivery.CourierManagement.service.impl;
 
 import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
+import com.codiecon.ExpressDelivery.CourierManagement.VO.SignInVo;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Courier;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.CourierRepository;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.CourierService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.FcmTokenService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.MailSenderService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.PasswordEncryption;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,13 +19,17 @@ public class CourierServiceImpl implements CourierService {
 
   private CourierRepository courierRepository;
   private PasswordEncryption passwordEncryption;
+  private MailSenderService mailSenderService;
+  private FcmTokenService fcmTokenService;
   Random random = new Random();
 
   @Autowired
   public CourierServiceImpl(CourierRepository courierRepository,
-      PasswordEncryptionImpl passwordEncryption) {
+      PasswordEncryptionImpl passwordEncryption,MailSenderService mailSenderService, FcmTokenService fcmTokenService) {
     this.courierRepository = courierRepository;
     this.passwordEncryption = passwordEncryption;
+    this.mailSenderService = mailSenderService;
+    this.fcmTokenService = fcmTokenService;
   }
 
   @Override
@@ -38,7 +45,7 @@ public class CourierServiceImpl implements CourierService {
     /*
     Send OTP verification mail
      */
-
+    mailSenderService.sendMail(courier.getEmail(),otp);
     courier.setOtp(otp);
     courierRepository.save(courier);
     return true;
@@ -69,5 +76,22 @@ public class CourierServiceImpl implements CourierService {
       return true;
     }
     return false;
+  }
+
+  @Override
+  public boolean signIn(SignInVo signInVo) {
+    Courier courier = courierRepository.getCourierByEmail(signInVo.getEmail());
+    String encryptedPassword = passwordEncryption.encrypt(signInVo.getPassword());
+    if (encryptedPassword.equals(courier.getPassword())){
+      fcmTokenService.save(signInVo.getEmail(),signInVo.getFcmToken());
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public boolean signOut(String courierId, String fcmToken) {
+    fcmTokenService.deleteToken(courierId, fcmToken);
+    return true;
   }
 }

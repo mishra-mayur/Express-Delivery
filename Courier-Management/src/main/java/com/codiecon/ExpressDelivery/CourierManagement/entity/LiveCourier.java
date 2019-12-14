@@ -1,6 +1,6 @@
 package com.codiecon.ExpressDelivery.CourierManagement.entity;
 
-import com.codiecon.ExpressDelivery.CourierManagement.VO.GeoLocation;
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,9 +34,7 @@ public class LiveCourier implements Serializable {
   @Column(name = ID)
   private String id;
   private String courierId;
-//  private GeoLocation courierLocation;
-  private TripStatus status;
-
+  private CourierStatus status;
   private double latitude;
   private double longitude;
 

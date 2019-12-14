@@ -46,7 +46,7 @@ public class BookingRequestServiceImpl implements BookingRequestService {
     while (!isCourierFetched) {
 
       List<LiveCourier> liveCouriers = liveCourierService
-          .findLiveCouriersNearBy(TripStatus.ACTIVE, courierFetchMinDistance,
+          .findLiveCouriersNearBy(CourierStatus.ACTIVE, courierFetchMinDistance,
               bookingRequest.getPickupLocation(), bookingRequest.getLocationName());
 
       // send notification to these live couriers async
