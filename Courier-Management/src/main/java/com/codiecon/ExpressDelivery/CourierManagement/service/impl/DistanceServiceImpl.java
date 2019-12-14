@@ -44,23 +44,28 @@ public class DistanceServiceImpl implements DistanceService {
     return Math.sqrt(distance);
   }
 
-
-  public double deltaLatitude(double distance, GeoLocation geoLocation){
-    double magicNumber = 0.00449660802;
-    return 0;
-  }
-
-
-  public double deltaLongitude(double distance, GeoLocation geoLocation){
-    double magicNumber = 0.00461435981;
-
-    return geoLocation.getLongitude()*(1-distance*magicNumber/500);
-  }
+//
+//  public double deltaLatitude(double distance, GeoLocation geoLocation){
+//    double magicNumber = 0.00449660802;
+//    return 0;
+//  }
+//
+//
+//  public double deltaLongitude(double distance, GeoLocation geoLocation){
+//    double magicNumber = 0.00461435981;
+//
+//    return geoLocation.getLongitude()*(1-distance*magicNumber/500);
+//  }
 
 
   @Override
   public void saveDistanceConst(DistanceConstant distanceConstant){
     distanceConstantRepository.save(distanceConstant);
+  }
+
+  @Override
+  public DistanceConstant getDistanceConstantFromLocation(String location){
+    return distanceConstantRepository.findByLocation(location);
   }
 
 }

@@ -42,14 +42,15 @@ public class BookingRequestServiceImpl implements BookingRequestService {
   public void bookTrip(BookingRequest bookingRequest) {
     saveBookingRequest(bookingRequest);
 
-    List<LiveCourier> liveCouriers =
-        liveCourierService.findLiveCouriersByTripStatus(TripStatus.ACTIVE);
     boolean isCourierFetched = false;
     while (!isCourierFetched) {
 
+      List<LiveCourier> liveCouriers = liveCourierService
+          .findLiveCouriersNearBy(TripStatus.ACTIVE, courierFetchMinDistance,
+              bookingRequest.getPickupLocation(), bookingRequest.getLocationName());
 
-//      for (liveCouriers)
-//      double distanceService.distance();
+      // send notification to these live couriers async
+
 
 
     }
