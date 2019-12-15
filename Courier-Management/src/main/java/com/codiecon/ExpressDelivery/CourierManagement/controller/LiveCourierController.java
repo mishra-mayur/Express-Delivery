@@ -1,6 +1,7 @@
 package com.codiecon.ExpressDelivery.CourierManagement.controller;
 
 import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
+import com.codiecon.ExpressDelivery.CourierManagement.VO.LiveLocationVO;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.LiveCourier;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Merchant;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.LiveCourierService;
@@ -35,11 +36,13 @@ public class LiveCourierController {
   }
 
   @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE , produces = MediaType.APPLICATION_JSON_VALUE)
-  public BaseResponse updateLocation(
-      @RequestParam("courierId") String courierId, @RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) {
-    log.info(" {}", courierId);
-    liveCourierService.updateLiveLocation(courierId, latitude, longitude);
-    return new BaseResponse(true, HttpStatus.OK.value());
+  public BaseResponse updateLocation(@RequestBody LiveLocationVO liveLocationVO) {
+    log.info(" {}", liveLocationVO.getEmail());
+    if (liveCourierService.findLiveCourierByCourierId(liveLocationVO.getEmail()) != null) {
+      liveCourierService.updateLiveLocation(liveLocationVO.getEmail(), liveLocationVO.getLatitude(), liveLocationVO.getLongitude());
+      return new BaseResponse(true, HttpStatus.OK.value());
+    }
+    return new BaseResponse("No Courier with mail ID exist","Please check the Live courier ID or else register a courier");
   }
 
   @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
