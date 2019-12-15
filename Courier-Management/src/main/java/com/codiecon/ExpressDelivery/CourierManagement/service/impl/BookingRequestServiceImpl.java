@@ -1,36 +1,23 @@
 package com.codiecon.ExpressDelivery.CourierManagement.service.impl;
 
 import com.codiecon.ExpressDelivery.CourierManagement.Enum.BookingStatus;
-import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.VO.BookingVo;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingResponse;
-import com.codiecon.ExpressDelivery.CourierManagement.entity.LiveCourier;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.BookingRequestRepository;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingAsyncApiService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingRequestService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.DistanceService;
-import com.codiecon.ExpressDelivery.CourierManagement.service.api.FcmTokenService;
-import com.codiecon.ExpressDelivery.CourierManagement.service.api.LiveCourierService;
-import com.codiecon.ExpressDelivery.CourierManagement.service.api.PushNotificationService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class BookingRequestServiceImpl implements BookingRequestService {
-
-  @Value("${courier.fetch.min.distance:100}")
-  private int courierFetchMinDistance;
 
   @Value("${courier.base.fare:50}")
   private int baseFare;
@@ -44,13 +31,7 @@ public class BookingRequestServiceImpl implements BookingRequestService {
   private BookingRequestRepository bookingRequestRepository;
 
   @Autowired
-  private LiveCourierService liveCourierService;
-
-  @Autowired
-  private PushNotificationService pushNotificationService;
-
-  @Autowired
-  private FcmTokenService fcmTokenService;
+  private BookingAsyncApiService bookingAsyncApiService;
 
   @Override
   public void saveBookingRequest(BookingRequest bookingRequest) {
@@ -64,42 +45,12 @@ public class BookingRequestServiceImpl implements BookingRequestService {
 
   @Override// todo  async
   public BookingResponse bookTrip(BookingRequest bookingRequest) {
-    try {
-      bookingRequest.setStatus(BookingStatus.PENDING);
-      bookingRequest.setBookingRequestId(UUID.randomUUID().toString());
-      BookingVo bookingVo = getBookingVoFromBookingRequest(bookingRequest);
-      saveBookingRequest(bookingRequest);
+    bookingRequest.setStatus(BookingStatus.PENDING);
+    bookingRequest.setBookingRequestId(UUID.randomUUID().toString());
+    BookingVo bookingVo = getBookingVoFromBookingRequest(bookingRequest);
+    saveBookingRequest(bookingRequest);
 
-      boolean isCourierFetched = false;
-      int i =1;
-      while (!isCourierFetched) {
-        List<LiveCourier> liveCouriers  =new ArrayList<>();
-        liveCouriers = liveCourierService
-            .findLiveCouriersNearBy(CourierStatus.ACTIVE, courierFetchMinDistance*i,
-                bookingRequest.getPickupLocation(), bookingRequest.getLocationName());
-        List<String> liveCourierIds =
-            liveCouriers.stream().map(LiveCourier::getCourierId).collect(Collectors.toList());
-        if(!CollectionUtils.isEmpty(liveCourierIds)) {
-          List<String> liveCourierFcmTokens = fcmTokenService.getFcmTokenList(liveCourierIds);
-
-          //      if (!CollectionUtils.isEmpty(liveCourierFcmTokens)) {
-          ObjectMapper objectMapper = new ObjectMapper();
-          String requestBody = objectMapper.writeValueAsString(bookingVo);
-
-          for (String token : liveCourierFcmTokens) {
-            pushNotificationService
-                .sendNotification(token, "BookingRequest", requestBody, "BookingRequest");
-          }
-          i++;
-          isCourierFetched = true;//todo logic for is courier fetched
-        }
-      }
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-
-
-    //todo make this part non async while making method async
+    bookingAsyncApiService.bookCouriers(bookingRequest, bookingVo);
     double distance = distanceService.distance(bookingRequest.getPickupLocation().getLatitude(),
         bookingRequest.getPickupLocation().getLongitude(),
         bookingRequest.getDeliveryLocation().getLatitude(),
@@ -119,13 +70,25 @@ public class BookingRequestServiceImpl implements BookingRequestService {
 
   @Override
   public double getBookingPriceById(String bookingRequestId) {
-    BookingRequest bookingRequest = bookingRequestRepository.findByBookingRequestId(bookingRequestId);
+    BookingRequest bookingRequest =
+        bookingRequestRepository.findByBookingRequestId(bookingRequestId);
     if (!Objects.isNull(bookingRequest))
       return bookingRequest.getProductPrice();
     return 0;
   }
 
-  private BookingVo getBookingVoFromBookingRequest(BookingRequest bookingRequest){
+  @Override
+  @Transactional
+  public void updateStatus(String bookingRequestId, BookingStatus status) {
+    bookingRequestRepository.updateStatus(bookingRequestId, status);
+  }
+
+  @Override
+  public BookingRequest getBookingRequestByBookingRequestId(String bookingRequestId) {
+    return bookingRequestRepository.findByBookingRequestId(bookingRequestId);
+  }
+
+  private BookingVo getBookingVoFromBookingRequest(BookingRequest bookingRequest) {
     BookingVo bookingVo = new BookingVo();
     bookingVo.setBookingRequestId(bookingRequest.getBookingRequestId());
     bookingVo.setCustomerName(bookingRequest.getCustomerName());

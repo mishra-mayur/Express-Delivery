@@ -1,8 +1,11 @@
 package com.codiecon.ExpressDelivery.CourierManagement.controller;
 
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.BookingStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
+import com.codiecon.ExpressDelivery.CourierManagement.VO.EndTripVO;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingResponse;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingAsyncApiService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingRequestService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingResponseService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.CourierService;
@@ -47,6 +50,9 @@ public class BookingController {
   @Autowired
   private TripService tripService;
 
+  @Autowired
+  private BookingAsyncApiService bookingAsyncApiService;
+
 
   @RequestMapping(method = {RequestMethod.GET})
   public BaseListResponse<BookingRequest> getBookingRequestsByCustomerId(@RequestParam String customerId)
@@ -73,12 +79,25 @@ public class BookingController {
     boolean isBooked = bookingResponseService.acceptBooking(response);
     double price = bookingService.getBookingPriceById(response.getBookingRequestId());
     boolean isAdded = tripService.acceptBooking(response, price);
+    bookingAsyncApiService.sendBookedCourierNotification(response);
     if (isAdded && isBooked) {
       liveCourierService.updateStatus(response.getCourierId(), CourierStatus.BUSY);
       courierService.updateCourierStatus(response.getCourierId(),CourierStatus.BUSY);
       return new BaseResponse(true, HttpStatus.OK.value());
     }
     return new BaseResponse("Error in accepting trip","Error in taking this booking please try again");
+  }
+
+  @RequestMapping(method = {RequestMethod.PUT}, value = "/endTrip")
+  public BaseResponse endTrip(@RequestBody EndTripVO endTripVO) throws Exception{
+    try {
+      bookingResponseService.updateStatus(endTripVO.getBookingRequestId(), BookingStatus.DONE);
+      bookingService.updateStatus(endTripVO.getBookingRequestId(), BookingStatus.DONE);
+      liveCourierService.updateStatus(endTripVO.getCourierId(), CourierStatus.ACTIVE);
+      courierService.updateCourierStatus(endTripVO.getCourierId(),CourierStatus.ACTIVE);
+      return new BaseResponse(true, HttpStatus.OK.value());
+    } catch (Exception e) {
+      return new BaseResponse("Error in ending trip","Error in ending this booking please try again");    }
   }
 
 

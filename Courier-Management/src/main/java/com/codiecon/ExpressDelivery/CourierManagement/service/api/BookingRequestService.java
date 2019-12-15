@@ -1,6 +1,7 @@
 package com.codiecon.ExpressDelivery.CourierManagement.service.api;
 
 
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.BookingStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingResponse;
 
@@ -14,4 +15,8 @@ public interface BookingRequestService {
   BookingResponse bookTrip(BookingRequest bookingRequest);
 
   double getBookingPriceById(String bookingRequestId);
+
+  void updateStatus(String bookingRequestId, BookingStatus status);
+
+  BookingRequest getBookingRequestByBookingRequestId(String bookingRequestId);
 }

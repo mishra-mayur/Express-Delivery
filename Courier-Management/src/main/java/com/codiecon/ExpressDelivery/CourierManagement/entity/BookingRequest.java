@@ -41,5 +41,7 @@ public class BookingRequest implements Serializable {
 
   private String locationName;
 
+  private String fcmToken;
+
   private BookingStatus status;
 }

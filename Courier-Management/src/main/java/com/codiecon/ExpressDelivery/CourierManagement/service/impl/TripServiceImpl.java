@@ -1,11 +1,13 @@
 package com.codiecon.ExpressDelivery.CourierManagement.service.impl;
 
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.BookingStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingResponse;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Trip;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.TripRepository;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -21,4 +23,5 @@ public class TripServiceImpl implements TripService {
     Trip trip1 = tripRepository.save(trip);
     return !Objects.isNull(trip1);
   }
+
 }
