@@ -3,10 +3,10 @@ package com.codiecon.ExpressDelivery.CourierManagement.service.impl;
 import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.VO.SignInVo;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Courier;
-import com.codiecon.ExpressDelivery.CourierManagement.entity.FCMToken;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.CourierRepository;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.CourierService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.FcmTokenService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.LiveCourierService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.MailSenderService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.PasswordEncryption;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +23,18 @@ public class CourierServiceImpl implements CourierService {
   private PasswordEncryption passwordEncryption;
   private MailSenderService mailSenderService;
   private FcmTokenService fcmTokenService;
+  private LiveCourierService liveCourierService;
   Random random = new Random();
 
   @Autowired
   public CourierServiceImpl(CourierRepository courierRepository,
-      PasswordEncryptionImpl passwordEncryption,MailSenderService mailSenderService, FcmTokenService fcmTokenService) {
+      PasswordEncryptionImpl passwordEncryption, MailSenderService mailSenderService,
+      FcmTokenService fcmTokenService, LiveCourierService liveCourierService) {
     this.courierRepository = courierRepository;
     this.passwordEncryption = passwordEncryption;
     this.mailSenderService = mailSenderService;
     this.fcmTokenService = fcmTokenService;
+    this.liveCourierService = liveCourierService;
   }
 
   @Override
@@ -46,7 +49,7 @@ public class CourierServiceImpl implements CourierService {
       String otp = String.format("%04d", random.nextInt(10000));
       courier.setOtp(otp);
       courierRepository.save(courier);
-      mailSenderService.sendMail(courier.getEmail(),otp);
+      mailSenderService.sendMail(courier.getEmail(), otp);
       return true;
     } catch (Exception e) {
       return false;
@@ -62,6 +65,7 @@ public class CourierServiceImpl implements CourierService {
   @Override
   public void updateCourierStatus(String email, CourierStatus status) {
     courierRepository.updateCourierStatus(email, status);
+    liveCourierService.updateStatus(email, status);
   }
 
   @Override
@@ -73,8 +77,9 @@ public class CourierServiceImpl implements CourierService {
   @Transactional
   public boolean verifyOtp(String email, String otp) {
     String courierOtp = courierRepository.getCourierByEmail(email).getOtp();
-    if(courierOtp.equals(otp)){
-      courierRepository.updateCourierStatus(email,CourierStatus.INACTIVE);
+    if (courierOtp.equals(otp)) {
+      courierRepository.updateCourierStatus(email, CourierStatus.INACTIVE);
+      liveCourierService.updateStatus(email, CourierStatus.INACTIVE);
       return true;
     }
     return false;
@@ -85,10 +90,13 @@ public class CourierServiceImpl implements CourierService {
     Courier courier = courierRepository.getCourierByEmail(signInVo.getEmail());
     if (Objects.nonNull(courier)) {
       String encryptedPassword = passwordEncryption.encrypt(signInVo.getPassword());
-      if (encryptedPassword.equals(courier.getPassword())){
-        String fcmToken = fcmTokenService.getFcmTokenByEmailAndToken(signInVo.getEmail(),signInVo.getFcmToken());
+      if (encryptedPassword.equals(courier.getPassword())) {
+        String fcmToken =
+            fcmTokenService.getFcmTokenByEmailAndToken(signInVo.getEmail(), signInVo.getFcmToken());
+        liveCourierService.updateStatus(signInVo.getEmail(),CourierStatus.ACTIVE);
+        courierRepository.updateCourierStatus(signInVo.getEmail(),CourierStatus.ACTIVE);
         if (Objects.isNull(fcmToken)) {
-          fcmTokenService.save(signInVo.getEmail(),signInVo.getFcmToken());
+          fcmTokenService.save(signInVo.getEmail(), signInVo.getFcmToken());
         }
         return true;
       }
@@ -99,6 +107,8 @@ public class CourierServiceImpl implements CourierService {
   @Override
   public boolean signOut(String courierId, String fcmToken) {
     fcmTokenService.deleteToken(courierId, fcmToken);
+    liveCourierService.updateStatus(courierId,CourierStatus.INACTIVE);
+    courierRepository.updateCourierStatus(courierId,CourierStatus.INACTIVE);
     return true;
   }
 }

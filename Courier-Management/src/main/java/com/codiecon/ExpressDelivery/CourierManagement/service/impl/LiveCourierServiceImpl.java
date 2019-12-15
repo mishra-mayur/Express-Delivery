@@ -59,4 +59,9 @@ public class LiveCourierServiceImpl implements LiveCourierService {
   public LiveCourier findLiveCourierByCourierId(String courierId) {
     return liveCourierRepository.findByCourierId(courierId);
   }
+
+  @Override
+  public void updateStatus(String email, CourierStatus status) {
+    liveCourierRepository.updateCourierStatus(email, status);
+  }
 }

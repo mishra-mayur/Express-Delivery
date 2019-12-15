@@ -18,4 +18,6 @@ public interface LiveCourierService {
   void updateLiveLocation(String courierId, double latitude, double longitude);
 
   LiveCourier findLiveCourierByCourierId(String courierId);
+
+  void updateStatus(String email, CourierStatus status);
 }

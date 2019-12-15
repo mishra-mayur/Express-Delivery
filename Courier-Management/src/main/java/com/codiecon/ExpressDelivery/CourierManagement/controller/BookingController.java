@@ -1,9 +1,12 @@
 package com.codiecon.ExpressDelivery.CourierManagement.controller;
 
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingResponse;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingRequestService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingResponseService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.CourierService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.LiveCourierService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.TripService;
 import com.codiecon.ExpressDelivery.CourierManagement.util.ApiPath;
 import com.gdn.tms.util.rest.model.response.BaseListResponse;
@@ -35,6 +38,12 @@ public class BookingController {
   private BookingResponseService bookingResponseService;
 
   @Autowired
+  private LiveCourierService liveCourierService;
+
+  @Autowired
+  private CourierService courierService;
+
+  @Autowired
   private TripService tripService;
 
 
@@ -63,8 +72,11 @@ public class BookingController {
     boolean isBooked = bookingResponseService.acceptBooking(response);
     double price = bookingService.getBookingPriceById(response.getBookingRequestId());
     boolean isAdded = tripService.acceptBooking(response, price);
-    if (isAdded && isBooked)
+    if (isAdded && isBooked) {
+      liveCourierService.updateStatus(response.getCourierId(), CourierStatus.BUSY);
+      courierService.updateCourierStatus(response.getCourierId(),CourierStatus.BUSY);
       return new BaseResponse(true, HttpStatus.OK.value());
+    }
     return new BaseResponse("Error in accepting trip","Error in taking this booking please try again");
   }
 

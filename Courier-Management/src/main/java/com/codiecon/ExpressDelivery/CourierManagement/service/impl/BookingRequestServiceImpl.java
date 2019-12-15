@@ -100,6 +100,7 @@ public class BookingRequestServiceImpl implements BookingRequestService {
 
   private BookingVo getBookingVoFromBookingRequest(BookingRequest bookingRequest){
     BookingVo bookingVo = new BookingVo();
+    bookingVo.setBookingRequestId(bookingRequest.getId());
     bookingVo.setCustomerName(bookingRequest.getCustomerName());
     bookingVo.setCustomerPhone(bookingRequest.getCustomerName());
     bookingVo.setDeliveryLatitude(bookingRequest.getDeliveryLocation().getLatitude());

@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class BookingVo {
+  private String bookingRequestId;
   private String customerName;
   private String customerPhone;
   private double deliveryLatitude;
