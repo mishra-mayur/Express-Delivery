@@ -20,4 +20,7 @@ public interface FcmTokenRepository extends JpaRepository<FCMToken, String> {
   List<FCMToken> findAllFCMTokenById(@Param("courierId") List<String> courierId);
 
   String findFCMTokenByEmail(String email);
+
+  @Query(value = "SELECT FT FROM FCMToken FT where FT.email = :email AND FT.FcmToken = :fcmToken")
+  FCMToken findByEmailAndFcmToken(@Param("email") String email, @Param("fcmToken") String fcmToken);
 }

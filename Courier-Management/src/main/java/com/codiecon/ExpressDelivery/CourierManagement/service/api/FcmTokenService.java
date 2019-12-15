@@ -10,5 +10,7 @@ public interface FcmTokenService {
 
   String getFcmToken(String email);
 
+  String getFcmTokenByEmailAndToken(String email, String token);
+
   List<String> getFcmTokenList(List<String> courierIdList);
 }

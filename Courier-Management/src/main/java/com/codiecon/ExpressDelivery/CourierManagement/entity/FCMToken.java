@@ -14,6 +14,8 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = FCMToken.FCM_TOKEN)
+@NoArgsConstructor
+@AllArgsConstructor
 public class FCMToken {
   public static final String FCM_TOKEN = "fcmToken";
   public static final String ID = "id";

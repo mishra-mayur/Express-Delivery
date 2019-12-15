@@ -3,6 +3,7 @@ package com.codiecon.ExpressDelivery.CourierManagement.service.impl;
 import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.VO.SignInVo;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Courier;
+import com.codiecon.ExpressDelivery.CourierManagement.entity.FCMToken;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.CourierRepository;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.CourierService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.FcmTokenService;
@@ -85,7 +86,10 @@ public class CourierServiceImpl implements CourierService {
     if (Objects.nonNull(courier)) {
       String encryptedPassword = passwordEncryption.encrypt(signInVo.getPassword());
       if (encryptedPassword.equals(courier.getPassword())){
-        fcmTokenService.save(signInVo.getEmail(),signInVo.getFcmToken());
+        String fcmToken = fcmTokenService.getFcmTokenByEmailAndToken(signInVo.getEmail(),signInVo.getFcmToken());
+        if (Objects.isNull(fcmToken)) {
+          fcmTokenService.save(signInVo.getEmail(),signInVo.getFcmToken());
+        }
         return true;
       }
     }
