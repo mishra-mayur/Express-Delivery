@@ -1,6 +1,7 @@
 package com.codiecon.ExpressDelivery.CourierManagement.controller;
 
 import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
+import com.codiecon.ExpressDelivery.CourierManagement.VO.CourierStatusUpdateRequest;
 import com.codiecon.ExpressDelivery.CourierManagement.VO.SignInVo;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Courier;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Merchant;
@@ -45,10 +46,9 @@ public class CourierController {
 
   @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE,
                   produces = MediaType.APPLICATION_JSON_VALUE)
-  public BaseResponse updateStatus(@RequestParam("email") String email,
-      @RequestParam("status") CourierStatus status) {
-    log.info(" {}", email);
-    courierService.updateCourierStatus(email, status);
+  public BaseResponse updateStatus(@RequestBody CourierStatusUpdateRequest request) {
+    log.info(" {}", request.getEmail());
+    courierService.updateCourierStatus(request.getEmail(), request.getStatus());
     return new BaseResponse(true, HttpStatus.OK.value());
   }
 
