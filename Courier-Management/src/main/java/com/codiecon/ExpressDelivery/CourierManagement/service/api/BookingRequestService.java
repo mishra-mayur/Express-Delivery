@@ -2,6 +2,7 @@ package com.codiecon.ExpressDelivery.CourierManagement.service.api;
 
 
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
+import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingResponse;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface BookingRequestService {
 
   List<BookingRequest> getBookingRequestByCusotmerId(String customerId);
 
-  void bookTrip(BookingRequest bookingRequest);
+  BookingResponse bookTrip(BookingRequest bookingRequest);
 
   double getBookingPriceById(String bookingRequestId);
 }

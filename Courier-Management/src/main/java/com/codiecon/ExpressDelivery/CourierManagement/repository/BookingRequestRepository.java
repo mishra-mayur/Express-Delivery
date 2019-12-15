@@ -11,5 +11,6 @@ public interface BookingRequestRepository extends JpaRepository<BookingRequest, 
 
 
   List<BookingRequest> findAllByCustomerId(String customerId);
+  BookingRequest findByBookingRequestId(String bookingRequestId);
 
 }

@@ -11,6 +11,7 @@ import com.codiecon.ExpressDelivery.CourierManagement.service.api.TripService;
 import com.codiecon.ExpressDelivery.CourierManagement.util.ApiPath;
 import com.gdn.tms.util.rest.model.response.BaseListResponse;
 import com.gdn.tms.util.rest.model.response.BaseResponse;
+import com.gdn.tms.util.rest.model.response.BaseSingleResponse;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +63,9 @@ public class BookingController {
   }
 
   @RequestMapping(method = {RequestMethod.POST} , value = "/trip")
-  public BaseResponse bookTrip(@RequestBody BookingRequest bookingRequest) throws Exception {
-    bookingService.bookTrip(bookingRequest);
-    return new BaseResponse(true, HttpStatus.OK.value());
+  public BaseSingleResponse<BookingResponse> bookTrip(@RequestBody BookingRequest bookingRequest) throws Exception {
+    BookingResponse bookingResponse = bookingService.bookTrip(bookingRequest);
+    return new BaseSingleResponse<>(true, HttpStatus.OK.value(), bookingResponse);
   }
 
   @RequestMapping(method = {RequestMethod.PUT}, value = "/confirmBooking")

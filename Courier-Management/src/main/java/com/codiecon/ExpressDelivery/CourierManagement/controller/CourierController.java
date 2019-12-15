@@ -4,9 +4,11 @@ import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.VO.CourierStatusUpdateRequest;
 import com.codiecon.ExpressDelivery.CourierManagement.VO.SignInVo;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Courier;
+import com.codiecon.ExpressDelivery.CourierManagement.entity.LiveCourier;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Merchant;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.CourierService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.FcmTokenService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.LiveCourierService;
 import com.codiecon.ExpressDelivery.CourierManagement.util.ApiPath;
 import com.gdn.tms.util.rest.model.response.BaseResponse;
 import com.gdn.tms.util.rest.model.response.BaseSingleResponse;
@@ -32,11 +34,16 @@ public class CourierController {
   @Autowired
   private CourierService courierService;
 
+  @Autowired
+  LiveCourierService liveCourierService;
+
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE,
                   produces = MediaType.APPLICATION_JSON_VALUE, value = SIGNUP)
   public BaseResponse addCourier(@RequestBody Courier courier) {
     log.info("{}", courier.toString());
     boolean status = courierService.signUp(courier);
+    LiveCourier liveCourier = new LiveCourier("",courier.getEmail(),courier.getStatus(),0,0);
+    liveCourierService.save(liveCourier);
     if (status) {
       return new BaseResponse(true, HttpStatus.OK.value());
     } else {

@@ -86,6 +86,7 @@ public class CourierServiceImpl implements CourierService {
   }
 
   @Override
+  @Transactional
   public boolean signIn(SignInVo signInVo) {
     Courier courier = courierRepository.getCourierByEmail(signInVo.getEmail());
     if (Objects.nonNull(courier)) {

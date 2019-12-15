@@ -4,6 +4,7 @@ import com.codiecon.ExpressDelivery.CourierManagement.Enum.BookingStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.VO.BookingVo;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
+import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingResponse;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.LiveCourier;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.BookingRequestRepository;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingRequestService;
@@ -31,6 +32,11 @@ public class BookingRequestServiceImpl implements BookingRequestService {
   @Value("${courier.fetch.min.distance:100}")
   private int courierFetchMinDistance;
 
+  @Value("${courier.base.fare:50}")
+  private int baseFare;
+  @Value("${courier.fare.per.km:30}")
+  private int farePerKm;
+
   @Autowired
   private DistanceService distanceService;
 
@@ -57,7 +63,7 @@ public class BookingRequestServiceImpl implements BookingRequestService {
   }
 
   @Override// todo  async
-  public void bookTrip(BookingRequest bookingRequest) {
+  public BookingResponse bookTrip(BookingRequest bookingRequest) {
     try {
       bookingRequest.setStatus(BookingStatus.PENDING);
       bookingRequest.setBookingRequestId(UUID.randomUUID().toString());
@@ -93,13 +99,29 @@ public class BookingRequestServiceImpl implements BookingRequestService {
     }
 
 
+    //todo make this part non async while making method async
+    double distance = distanceService.distance(bookingRequest.getPickupLocation().getLatitude(),
+        bookingRequest.getPickupLocation().getLongitude(),
+        bookingRequest.getDeliveryLocation().getLatitude(),
+        bookingRequest.getDeliveryLocation().getLongitude(), 0, 0);
+    double bookingCost =
+        baseFare + distance * farePerKm + bookingRequest.getProductPrice() * bookingRequest
+            .getQuantity();
+    BookingResponse bookingResponse = new BookingResponse();
+    bookingResponse.setCourierId(null);
+    bookingResponse.setStatus(BookingStatus.PENDING);
+    bookingResponse.setBookingCost(bookingCost);
+    bookingResponse.setBookingRequestId(bookingRequest.getBookingRequestId());
+    bookingResponse.setId("id");
+    return bookingResponse;
+
   }
 
   @Override
   public double getBookingPriceById(String bookingRequestId) {
-    Optional<BookingRequest> bookingRequest = bookingRequestRepository.findById(bookingRequestId);
-    if (!Objects.isNull(bookingRequest.get()))
-      return bookingRequest.get().getProductPrice();
+    BookingRequest bookingRequest = bookingRequestRepository.findByBookingRequestId(bookingRequestId);
+    if (!Objects.isNull(bookingRequest))
+      return bookingRequest.getProductPrice();
     return 0;
   }
 

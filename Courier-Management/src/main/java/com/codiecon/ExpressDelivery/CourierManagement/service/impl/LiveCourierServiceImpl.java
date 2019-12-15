@@ -61,6 +61,7 @@ public class LiveCourierServiceImpl implements LiveCourierService {
   }
 
   @Override
+  @Transactional
   public void updateStatus(String email, CourierStatus status) {
     liveCourierRepository.updateCourierStatus(email, status);
   }
