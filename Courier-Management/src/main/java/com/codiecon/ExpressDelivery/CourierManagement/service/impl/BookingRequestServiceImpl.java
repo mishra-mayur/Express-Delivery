@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,14 +90,22 @@ public class BookingRequestServiceImpl implements BookingRequestService {
 
   }
 
+  @Override
+  public double getBookingPriceById(String bookingRequestId) {
+    Optional<BookingRequest> bookingRequest = bookingRequestRepository.findById(bookingRequestId);
+    if (!Objects.isNull(bookingRequest.get()))
+      return bookingRequest.get().getProductPrice();
+    return 0;
+  }
+
   private BookingVo getBookingVoFromBookingRequest(BookingRequest bookingRequest){
     BookingVo bookingVo = new BookingVo();
-    bookingVo.setCustomerName(bookingRequest.getCustomerId()); // todo customer details
-    bookingVo.setCustomerPhone(bookingRequest.getCustomerId()); // todo customer details
+    bookingVo.setCustomerName(bookingRequest.getCustomerName());
+    bookingVo.setCustomerPhone(bookingRequest.getCustomerName());
     bookingVo.setDeliveryLatitude(bookingRequest.getDeliveryLocation().getLatitude());
     bookingVo.setDeliveryLongitude(bookingRequest.getDeliveryLocation().getLongitude());
     bookingVo.setPickupLocationAddress(bookingRequest.getLocationName());
-    bookingVo.setDeliveryLocationAddress(bookingRequest.getLocationName()); //todo customer address
+    bookingVo.setDeliveryLocationAddress(bookingRequest.getLocationName());
     bookingVo.setPickupLatitude(bookingRequest.getPickupLocation().getLatitude());
     bookingVo.setPickupLongitude(bookingRequest.getPickupLocation().getLongitude());
     return bookingVo;

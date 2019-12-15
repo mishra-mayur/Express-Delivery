@@ -1,6 +1,8 @@
 package com.codiecon.ExpressDelivery.CourierManagement.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -12,6 +14,8 @@ import java.io.Serializable;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = Trip.TRIP)
 public class Trip  implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -24,9 +28,9 @@ public class Trip  implements Serializable {
   @Column(name = ID)
   private String id;
   @Column(name = "courier_id")
-  private long courierId;
-  @Column(name = "weight")
-  private double weight;
+  private String courierId;
+  @Column(name = "productPrice")
+  private double productPrice;
   @Column(name = "booking_id")
   private String bookingId;
 

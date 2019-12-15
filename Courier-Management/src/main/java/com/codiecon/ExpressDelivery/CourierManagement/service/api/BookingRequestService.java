@@ -11,4 +11,6 @@ public interface BookingRequestService {
   List<BookingRequest> getBookingRequestByCusotmerId(String customerId);
 
   void bookTrip(BookingRequest bookingRequest);
+
+  double getBookingPriceById(String bookingRequestId);
 }

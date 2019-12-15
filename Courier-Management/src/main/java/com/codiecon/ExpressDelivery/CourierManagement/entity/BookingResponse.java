@@ -1,5 +1,6 @@
 package com.codiecon.ExpressDelivery.CourierManagement.entity;
 
+import com.codiecon.ExpressDelivery.CourierManagement.Enum.BookingStatus;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -17,6 +18,8 @@ public class BookingResponse {
   private String id;
 
   private String bookingRequestId;
+
+  private BookingStatus status;
 
   private double bookingCost;
 

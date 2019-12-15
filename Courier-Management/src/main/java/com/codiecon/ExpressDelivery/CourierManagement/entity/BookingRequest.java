@@ -21,17 +21,23 @@ public class BookingRequest implements Serializable {
   @GenericGenerator(name = "system-uuid", strategy = "uuid2")
   private String id;
 
-  private String merchantId;
-
   private String customerId;
 
-  private String totalWeight;
+  private String customerName;
+
+  private String productName;
+
+  private double productPrice;
+
+  private String productDescription;
 
   private GeoLocation pickupLocation;
 
   private GeoLocation deliveryLocation;
 
-  private BookingStatus status;
+  private int quantity;
 
   private String locationName;
+
+  private BookingStatus status;
 }

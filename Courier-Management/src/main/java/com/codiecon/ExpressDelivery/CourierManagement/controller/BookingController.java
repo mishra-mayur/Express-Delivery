@@ -1,7 +1,10 @@
 package com.codiecon.ExpressDelivery.CourierManagement.controller;
 
 import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingRequest;
+import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingResponse;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingRequestService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingResponseService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.TripService;
 import com.codiecon.ExpressDelivery.CourierManagement.util.ApiPath;
 import com.gdn.tms.util.rest.model.response.BaseListResponse;
 import com.gdn.tms.util.rest.model.response.BaseResponse;
@@ -28,6 +31,12 @@ public class BookingController {
   @Autowired
   private BookingRequestService bookingService;
 
+  @Autowired
+  private BookingResponseService bookingResponseService;
+
+  @Autowired
+  private TripService tripService;
+
 
   @RequestMapping(method = {RequestMethod.GET})
   public BaseListResponse<BookingRequest> getBookingRequestsByCustomerId(@RequestParam String customerId)
@@ -49,7 +58,15 @@ public class BookingController {
     return new BaseResponse(true, HttpStatus.OK.value());
   }
 
-
+  @RequestMapping(method = {RequestMethod.PUT}, value = "/confirmBooking")
+  public BaseResponse acceptBooking(@RequestBody BookingResponse response) throws Exception{
+    boolean isBooked = bookingResponseService.acceptBooking(response);
+    double price = bookingService.getBookingPriceById(response.getBookingRequestId());
+    boolean isAdded = tripService.acceptBooking(response, price);
+    if (isAdded && isBooked)
+      return new BaseResponse(true, HttpStatus.OK.value());
+    return new BaseResponse("Error in accepting trip","Error in taking this booking please try again");
+  }
 
 
 }
