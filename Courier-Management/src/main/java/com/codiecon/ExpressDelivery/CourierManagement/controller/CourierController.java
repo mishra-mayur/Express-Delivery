@@ -1,17 +1,12 @@
 package com.codiecon.ExpressDelivery.CourierManagement.controller;
 
-import com.codiecon.ExpressDelivery.CourierManagement.Enum.CourierStatus;
 import com.codiecon.ExpressDelivery.CourierManagement.VO.CourierStatusUpdateRequest;
 import com.codiecon.ExpressDelivery.CourierManagement.VO.SignInVo;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.Courier;
 import com.codiecon.ExpressDelivery.CourierManagement.entity.LiveCourier;
-import com.codiecon.ExpressDelivery.CourierManagement.entity.Merchant;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.CourierService;
-import com.codiecon.ExpressDelivery.CourierManagement.service.api.FcmTokenService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.LiveCourierService;
-import com.codiecon.ExpressDelivery.CourierManagement.util.ApiPath;
 import com.gdn.tms.util.rest.model.response.BaseResponse;
-import com.gdn.tms.util.rest.model.response.BaseSingleResponse;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +37,7 @@ public class CourierController {
   public BaseResponse addCourier(@RequestBody Courier courier) {
     log.info("{}", courier.toString());
     boolean status = courierService.signUp(courier);
-    LiveCourier liveCourier = new LiveCourier("",courier.getEmail(),courier.getStatus(),0,0);
+    LiveCourier liveCourier = new LiveCourier("", courier.getEmail(), courier.getStatus(), 0, 0);
     liveCourierService.save(liveCourier);
     if (status) {
       return new BaseResponse(true, HttpStatus.OK.value());
@@ -55,8 +50,12 @@ public class CourierController {
                   produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse updateStatus(@RequestBody CourierStatusUpdateRequest request) {
     log.info(" {}", request.getEmail());
-    courierService.updateCourierStatus(request.getEmail(), request.getStatus());
-    return new BaseResponse(true, HttpStatus.OK.value());
+    if (courierService.updateCourierStatus(request.getEmail(), request.getStatus())) {
+      return new BaseResponse(true, HttpStatus.OK.value());
+    } else {
+      return new BaseResponse("Status not updated","Error in updating status");
+    }
+
   }
 
   @RequestMapping(method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -80,7 +79,8 @@ public class CourierController {
       return new BaseResponse("Wrong OTP entered", "You have entered wrong OTP please try again");
   }
 
-  @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, value = "/signIn")
+  @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE,
+                  value = "/signIn")
   public BaseResponse signIn(@RequestBody SignInVo signInVo) {
     log.info("request for checking otp verification");
     if (courierService.signIn(signInVo)) {
@@ -90,8 +90,10 @@ public class CourierController {
           "You have entered wrong Credentials please check your username and password");
   }
 
-  @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value = "/signOut")
-  public BaseResponse signOut(@RequestParam("courierId") String courierId, @RequestParam("fcmToken") String fcmToken) {
+  @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE, value
+      = "/signOut")
+  public BaseResponse signOut(@RequestParam("courierId") String courierId,
+      @RequestParam("fcmToken") String fcmToken) {
     log.info("request for checking otp verification");
     if (courierService.signOut(courierId, fcmToken)) {
       return new BaseResponse(true, HttpStatus.OK.value());

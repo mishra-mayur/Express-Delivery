@@ -19,5 +19,5 @@ public interface LiveCourierService {
 
   LiveCourier findLiveCourierByCourierId(String courierId);
 
-  void updateStatus(String email, CourierStatus status);
+  boolean updateStatus(String email, CourierStatus status);
 }

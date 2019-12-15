@@ -16,6 +16,6 @@ public interface CourierRepository extends JpaRepository<Courier, String> {
 
   @Modifying
   @Query(value = "UPDATE Courier C SET C.status = :status WHERE C.email =:email")
-  void updateCourierStatus(@Param("email") String email,@Param("status") CourierStatus status);
+  int updateCourierStatus(@Param("email") String email,@Param("status") CourierStatus status);
 
 }

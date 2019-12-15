@@ -63,9 +63,12 @@ public class CourierServiceImpl implements CourierService {
   }
 
   @Override
-  public void updateCourierStatus(String email, CourierStatus status) {
-    courierRepository.updateCourierStatus(email, status);
-    liveCourierService.updateStatus(email, status);
+  @Transactional
+  public boolean updateCourierStatus(String email, CourierStatus status) {
+    boolean updated = liveCourierService.updateStatus(email, CourierStatus.INACTIVE);
+    boolean updatedDone = courierRepository
+        .updateCourierStatus(email, CourierStatus.INACTIVE)==1;
+    return updated && updatedDone;
   }
 
   @Override
@@ -76,11 +79,14 @@ public class CourierServiceImpl implements CourierService {
   @Override
   @Transactional
   public boolean verifyOtp(String email, String otp) {
-    String courierOtp = courierRepository.getCourierByEmail(email).getOtp();
-    if (courierOtp.equals(otp)) {
-      courierRepository.updateCourierStatus(email, CourierStatus.INACTIVE);
-      liveCourierService.updateStatus(email, CourierStatus.INACTIVE);
-      return true;
+    Courier courier = courierRepository.getCourierByEmail(email);
+    if (Objects.nonNull(courier)) {
+      String courierOtp = courier.getOtp();
+      if (courierOtp.equals(otp)) {
+        courierRepository.updateCourierStatus(email, CourierStatus.INACTIVE);
+        liveCourierService.updateStatus(email, CourierStatus.INACTIVE);
+        return true;
+      }
     }
     return false;
   }
@@ -94,8 +100,8 @@ public class CourierServiceImpl implements CourierService {
       if (encryptedPassword.equals(courier.getPassword())) {
         String fcmToken =
             fcmTokenService.getFcmTokenByEmailAndToken(signInVo.getEmail(), signInVo.getFcmToken());
-        liveCourierService.updateStatus(signInVo.getEmail(),CourierStatus.ACTIVE);
-        courierRepository.updateCourierStatus(signInVo.getEmail(),CourierStatus.ACTIVE);
+        liveCourierService.updateStatus(signInVo.getEmail(), CourierStatus.ACTIVE);
+        courierRepository.updateCourierStatus(signInVo.getEmail(), CourierStatus.ACTIVE);
         if (Objects.isNull(fcmToken)) {
           fcmTokenService.save(signInVo.getEmail(), signInVo.getFcmToken());
         }
@@ -107,9 +113,16 @@ public class CourierServiceImpl implements CourierService {
 
   @Override
   public boolean signOut(String courierId, String fcmToken) {
-    fcmTokenService.deleteToken(courierId, fcmToken);
-    liveCourierService.updateStatus(courierId,CourierStatus.INACTIVE);
-    courierRepository.updateCourierStatus(courierId,CourierStatus.INACTIVE);
-    return true;
+    boolean updated = false;
+    boolean updatedDone = false;
+    try {
+      fcmTokenService.deleteToken(courierId, fcmToken);
+      updated = liveCourierService.updateStatus(courierId, CourierStatus.INACTIVE);
+      updatedDone = courierRepository
+          .updateCourierStatus(courierId, CourierStatus.INACTIVE)==1;
+    } catch (Exception e) {
+      return false;
+    }
+    return updated && updatedDone;
   }
 }

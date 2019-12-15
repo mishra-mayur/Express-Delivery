@@ -32,5 +32,5 @@ public interface LiveCourierRepository extends JpaRepository<LiveCourier, String
 
   @Modifying
   @Query(value = "UPDATE LiveCourier LC SET LC.status = :status WHERE LC.courierId = :email")
-  void updateCourierStatus(@Param("email") String email, @Param("status") CourierStatus status);
+  int updateCourierStatus(@Param("email") String email, @Param("status") CourierStatus status);
 }

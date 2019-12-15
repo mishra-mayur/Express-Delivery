@@ -19,8 +19,6 @@ import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,8 +53,8 @@ public class BookingController {
 
 
   @RequestMapping(method = {RequestMethod.GET})
-  public BaseListResponse<BookingRequest> getBookingRequestsByCustomerId(@RequestParam String customerId)
-      throws Exception {
+  public BaseListResponse<BookingRequest> getBookingRequestsByCustomerId(
+      @RequestParam String customerId) throws Exception {
     List<BookingRequest> bookingRequests = bookingService.getBookingRequestByCusotmerId(customerId);
     return new BaseListResponse<BookingRequest>(true, HttpStatus.OK.value(), bookingRequests);
   }
@@ -68,36 +66,39 @@ public class BookingController {
     return new BaseResponse(true, HttpStatus.OK.value());
   }
 
-  @RequestMapping(method = {RequestMethod.POST} , value = "/trip")
-  public BaseSingleResponse<BookingResponse> bookTrip(@RequestBody BookingRequest bookingRequest) throws Exception {
+  @RequestMapping(method = {RequestMethod.POST}, value = "/trip")
+  public BaseSingleResponse<BookingResponse> bookTrip(@RequestBody BookingRequest bookingRequest)
+      throws Exception {
     BookingResponse bookingResponse = bookingService.bookTrip(bookingRequest);
     return new BaseSingleResponse<>(true, HttpStatus.OK.value(), bookingResponse);
   }
 
   @RequestMapping(method = {RequestMethod.PUT}, value = "/confirmBooking")
-  public BaseResponse acceptBooking(@RequestBody BookingResponse response) throws Exception{
+  public BaseResponse acceptBooking(@RequestBody BookingResponse response) throws Exception {
     boolean isBooked = bookingResponseService.acceptBooking(response);
     double price = bookingService.getBookingPriceById(response.getBookingRequestId());
     boolean isAdded = tripService.acceptBooking(response, price);
     bookingAsyncApiService.sendBookedCourierNotification(response);
     if (isAdded && isBooked) {
       liveCourierService.updateStatus(response.getCourierId(), CourierStatus.BUSY);
-      courierService.updateCourierStatus(response.getCourierId(),CourierStatus.BUSY);
+      courierService.updateCourierStatus(response.getCourierId(), CourierStatus.BUSY);
       return new BaseResponse(true, HttpStatus.OK.value());
     }
-    return new BaseResponse("Error in accepting trip","Error in taking this booking please try again");
+    return new BaseResponse("Error in accepting trip",
+        "Error in taking this booking please try again");
   }
 
   @RequestMapping(method = {RequestMethod.PUT}, value = "/endTrip")
-  public BaseResponse endTrip(@RequestBody EndTripVO endTripVO) throws Exception{
+  public BaseResponse endTrip(@RequestBody EndTripVO endTripVO) throws Exception {
     try {
       bookingResponseService.updateStatus(endTripVO.getBookingRequestId(), BookingStatus.DONE);
       bookingService.updateStatus(endTripVO.getBookingRequestId(), BookingStatus.DONE);
-      liveCourierService.updateStatus(endTripVO.getCourierId(), CourierStatus.ACTIVE);
-      courierService.updateCourierStatus(endTripVO.getCourierId(),CourierStatus.ACTIVE);
+      courierService.updateCourierStatus(endTripVO.getCourierId(), CourierStatus.ACTIVE);
       return new BaseResponse(true, HttpStatus.OK.value());
     } catch (Exception e) {
-      return new BaseResponse("Error in ending trip","Error in ending this booking please try again");    }
+      return new BaseResponse("Error in ending trip",
+          "Error in ending this booking please try again");
+    }
   }
 
 

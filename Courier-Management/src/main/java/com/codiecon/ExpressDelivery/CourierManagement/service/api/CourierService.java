@@ -14,8 +14,7 @@ public interface CourierService {
 
   Courier getCourierByEmail(String email);
 
-  @Transactional
-  void updateCourierStatus(String email, CourierStatus status);
+  boolean updateCourierStatus(String email, CourierStatus status);
 
   boolean verifyOtp(String email, String otp);
 

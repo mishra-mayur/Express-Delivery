@@ -28,19 +28,21 @@ public class LiveCourierController {
   @Autowired
   private LiveCourierService liveCourierService;
 
-  @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE , produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE,
+                  produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse addLiveCourier(@RequestBody LiveCourier liveCourier) {
     log.info("{}", liveCourier.toString());
     liveCourierService.save(liveCourier);
     return new BaseResponse(true, HttpStatus.OK.value());
   }
 
-  @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE , produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE,
+                  produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse updateLocation(@RequestBody LiveLocationVO liveLocationVO) {
     log.info(" {}", liveLocationVO.getEmail());
     if (liveCourierService.findLiveCourierByCourierId(liveLocationVO.getEmail()) != null) {
-      liveCourierService.updateLiveLocation(liveLocationVO.getEmail(), liveLocationVO.getLatitude(), liveLocationVO.getLongitude());
-      return new BaseResponse(true, HttpStatus.OK.value());
+      liveCourierService.updateLiveLocation(liveLocationVO.getEmail(), liveLocationVO.getLatitude(),
+          liveLocationVO.getLongitude());
     } else {
       LiveCourier liveCourier = new LiveCourier();
       liveCourier.setCourierId(liveLocationVO.getEmail());
@@ -48,12 +50,14 @@ public class LiveCourierController {
       liveCourier.setLongitude(liveLocationVO.getLongitude());
       liveCourierService.save(liveCourier);
     }
-    return new BaseResponse("No Courier with mail ID exist","Please check the Live courier ID or else register a courier");
+    return new BaseResponse(true, HttpStatus.OK.value());
   }
 
   @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-  public BaseSingleResponse<LiveCourier> getLiveLocation(@RequestParam("courierId") String courierId) {
+  public BaseSingleResponse<LiveCourier> getLiveLocation(
+      @RequestParam("courierId") String courierId) {
     log.info("fetching live location");
-    return new BaseSingleResponse(true, HttpStatus.OK.value(), liveCourierService.findLiveCourierByCourierId(courierId));
+    return new BaseSingleResponse(true, HttpStatus.OK.value(),
+        liveCourierService.findLiveCourierByCourierId(courierId));
   }
 }
