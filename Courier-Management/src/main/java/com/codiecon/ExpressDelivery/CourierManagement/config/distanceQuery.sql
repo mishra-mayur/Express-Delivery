@@ -1,0 +1,1 @@
+INSERT INTO "public"."distance_constant" ("id", "latitude_constant", "location", "longitude_constant") VALUES ('id1', '0.00449660802', 'Bangalore', '0.00461435981');
