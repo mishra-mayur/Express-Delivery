@@ -21,6 +21,8 @@ public class BookingRequest implements Serializable {
   @GenericGenerator(name = "system-uuid", strategy = "uuid2")
   private String id;
 
+  private String bookingRequestId;
+
   private String customerId;
 
   private String customerName;

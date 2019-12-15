@@ -18,9 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,30 +60,33 @@ public class BookingRequestServiceImpl implements BookingRequestService {
   public void bookTrip(BookingRequest bookingRequest) {
     try {
       bookingRequest.setStatus(BookingStatus.PENDING);
+      bookingRequest.setBookingRequestId(UUID.randomUUID().toString());
       BookingVo bookingVo = getBookingVoFromBookingRequest(bookingRequest);
       saveBookingRequest(bookingRequest);
 
       boolean isCourierFetched = false;
       int i =1;
       while (!isCourierFetched) {
-
-        List<LiveCourier> liveCouriers = liveCourierService
+        List<LiveCourier> liveCouriers  =new ArrayList<>();
+        liveCouriers = liveCourierService
             .findLiveCouriersNearBy(CourierStatus.ACTIVE, courierFetchMinDistance*i,
                 bookingRequest.getPickupLocation(), bookingRequest.getLocationName());
         List<String> liveCourierIds =
             liveCouriers.stream().map(LiveCourier::getCourierId).collect(Collectors.toList());
-        List<String> liveCourierFcmTokens = fcmTokenService.getFcmTokenList(liveCourierIds);
+        if(!CollectionUtils.isEmpty(liveCourierIds)) {
+          List<String> liveCourierFcmTokens = fcmTokenService.getFcmTokenList(liveCourierIds);
 
-  //      if (!CollectionUtils.isEmpty(liveCourierFcmTokens)) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String requestBody = objectMapper.writeValueAsString(bookingVo);
+          //      if (!CollectionUtils.isEmpty(liveCourierFcmTokens)) {
+          ObjectMapper objectMapper = new ObjectMapper();
+          String requestBody = objectMapper.writeValueAsString(bookingVo);
 
-        for (String token : liveCourierFcmTokens) {
-          pushNotificationService
-              .sendNotification(token, "BookingRequest", requestBody, "BookingRequest");
+          for (String token : liveCourierFcmTokens) {
+            pushNotificationService
+                .sendNotification(token, "BookingRequest", requestBody, "BookingRequest");
+          }
+          i++;
+          isCourierFetched = true;//todo logic for is courier fetched
         }
-        i++;
-        isCourierFetched=true;//todo logic for is courier fetched
       }
     } catch (JsonProcessingException e) {
       e.printStackTrace();
@@ -100,7 +105,7 @@ public class BookingRequestServiceImpl implements BookingRequestService {
 
   private BookingVo getBookingVoFromBookingRequest(BookingRequest bookingRequest){
     BookingVo bookingVo = new BookingVo();
-    bookingVo.setBookingRequestId(bookingRequest.getId());
+    bookingVo.setBookingRequestId(bookingRequest.getBookingRequestId());
     bookingVo.setCustomerName(bookingRequest.getCustomerName());
     bookingVo.setCustomerPhone(bookingRequest.getCustomerName());
     bookingVo.setDeliveryLatitude(bookingRequest.getDeliveryLocation().getLatitude());
