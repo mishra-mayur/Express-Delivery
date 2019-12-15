@@ -41,6 +41,12 @@ public class LiveCourierController {
     if (liveCourierService.findLiveCourierByCourierId(liveLocationVO.getEmail()) != null) {
       liveCourierService.updateLiveLocation(liveLocationVO.getEmail(), liveLocationVO.getLatitude(), liveLocationVO.getLongitude());
       return new BaseResponse(true, HttpStatus.OK.value());
+    } else {
+      LiveCourier liveCourier = new LiveCourier();
+      liveCourier.setCourierId(liveLocationVO.getEmail());
+      liveCourier.setLatitude(liveLocationVO.getLatitude());
+      liveCourier.setLongitude(liveLocationVO.getLongitude());
+      liveCourierService.save(liveCourier);
     }
     return new BaseResponse("No Courier with mail ID exist","Please check the Live courier ID or else register a courier");
   }
