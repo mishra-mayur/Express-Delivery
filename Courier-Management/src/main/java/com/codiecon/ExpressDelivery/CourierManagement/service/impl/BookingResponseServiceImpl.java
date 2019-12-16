@@ -17,9 +17,18 @@ public class BookingResponseServiceImpl implements BookingResponseService {
   private BookingResponseRepository bookingResponseRepository;
 
   @Override
+  @Transactional
   public boolean acceptBooking(BookingResponse response) {
-    BookingResponse bookingResponse = bookingResponseRepository.save(response);
-    return !Objects.isNull(bookingResponse);
+    BookingResponse bookingResponse;
+    if (Objects.isNull(
+        bookingResponseRepository.findByBookingRequestId(response.getBookingRequestId()))) {
+      bookingResponse = bookingResponseRepository.save(response);
+      return !Objects.isNull(bookingResponse);
+    } else {
+      return bookingResponseRepository
+          .updateResponse(response.getBookingRequestId(), response.getStatus(),
+              response.getBookingCost(), response.getCourierId()) == 1;
+    }
   }
 
   @Override
@@ -30,6 +39,6 @@ public class BookingResponseServiceImpl implements BookingResponseService {
   @Override
   @Transactional
   public void updateStatus(String bookingRequestId, BookingStatus status) {
-    bookingResponseRepository.updateStatus(bookingRequestId,status);
+    bookingResponseRepository.updateStatus(bookingRequestId, status);
   }
 }

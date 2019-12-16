@@ -51,10 +51,10 @@ public class BookingAsyncApiServiceImpl implements BookingAsyncApiService {
   private CourierService courierService;
 
 
-  @Value("${courier.fetch.min.distance:100}")
+  @Value("${courier.fetch.min.distance:100000000}")
   private int courierFetchMinDistance;
 
-  @Value("${courier.fetch.wait.time:10000}")
+  @Value("${courier.fetch.wait.time:60000}")
   private int waitTime;
 
   @Value("${courier.fetch.try:4}")
@@ -83,11 +83,11 @@ public class BookingAsyncApiServiceImpl implements BookingAsyncApiService {
             pushNotificationService
                 .sendNotification(token, "BookingRequest", requestBody, "BookingRequest");
           }
-          BookingStatus bookingStatus =
-              bookingResponseService.getStatus(bookingRequest.getBookingRequestId());
-          if (bookingStatus.equals(BookingStatus.COURIER_ASSIGNED)) {
-            isCourierFetched = true;
-          }
+        }
+        BookingStatus bookingStatus =
+            bookingResponseService.getStatus(bookingRequest.getBookingRequestId());
+        if (bookingStatus.equals(BookingStatus.COURIER_ASSIGNED) || bookingStatus.equals((BookingStatus.DONE))) {
+          isCourierFetched = true;
         }
         try {
           Thread.sleep(waitTime);

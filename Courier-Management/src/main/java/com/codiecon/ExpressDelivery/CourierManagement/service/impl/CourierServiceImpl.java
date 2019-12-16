@@ -65,9 +65,9 @@ public class CourierServiceImpl implements CourierService {
   @Override
   @Transactional
   public boolean updateCourierStatus(String email, CourierStatus status) {
-    boolean updated = liveCourierService.updateStatus(email, CourierStatus.INACTIVE);
+    boolean updated = liveCourierService.updateStatus(email, status);
     boolean updatedDone = courierRepository
-        .updateCourierStatus(email, CourierStatus.INACTIVE)==1;
+        .updateCourierStatus(email, status)==1;
     return updated && updatedDone;
   }
 
@@ -112,6 +112,7 @@ public class CourierServiceImpl implements CourierService {
   }
 
   @Override
+  @Transactional
   public boolean signOut(String courierId, String fcmToken) {
     boolean updated = false;
     boolean updatedDone = false;

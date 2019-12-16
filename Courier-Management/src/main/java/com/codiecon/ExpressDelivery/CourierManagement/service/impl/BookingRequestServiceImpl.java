@@ -7,6 +7,7 @@ import com.codiecon.ExpressDelivery.CourierManagement.entity.BookingResponse;
 import com.codiecon.ExpressDelivery.CourierManagement.repository.BookingRequestRepository;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingAsyncApiService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingRequestService;
+import com.codiecon.ExpressDelivery.CourierManagement.service.api.BookingResponseService;
 import com.codiecon.ExpressDelivery.CourierManagement.service.api.DistanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,9 @@ public class BookingRequestServiceImpl implements BookingRequestService {
   @Autowired
   private BookingAsyncApiService bookingAsyncApiService;
 
+  @Autowired
+  private BookingResponseService bookingResponseService;
+
   @Override
   public void saveBookingRequest(BookingRequest bookingRequest) {
     bookingRequestRepository.save(bookingRequest);
@@ -43,14 +47,19 @@ public class BookingRequestServiceImpl implements BookingRequestService {
     return bookingRequestRepository.findAllByCustomerId(customerId);
   }
 
-  @Override// todo  async
+  @Override
   public BookingResponse bookTrip(BookingRequest bookingRequest) {
     bookingRequest.setStatus(BookingStatus.PENDING);
     bookingRequest.setBookingRequestId(UUID.randomUUID().toString());
     BookingVo bookingVo = getBookingVoFromBookingRequest(bookingRequest);
     saveBookingRequest(bookingRequest);
-
-    bookingAsyncApiService.bookCouriers(bookingRequest, bookingVo);
+    BookingResponse bookingResponse1 = new BookingResponse(bookingRequest.getBookingRequestId(),BookingStatus.PENDING,0.0);
+    bookingResponseService.acceptBooking(bookingResponse1);
+    BookingStatus bookingStatus =
+        bookingResponseService.getStatus(bookingRequest.getBookingRequestId());
+    if (!bookingStatus.equals(BookingStatus.COURIER_ASSIGNED) || !bookingStatus.equals((BookingStatus.DONE))) {
+      bookingAsyncApiService.bookCouriers(bookingRequest, bookingVo);
+    }
     double distance = distanceService.distance(bookingRequest.getPickupLocation().getLatitude(),
         bookingRequest.getPickupLocation().getLongitude(),
         bookingRequest.getDeliveryLocation().getLatitude(),
@@ -86,6 +95,11 @@ public class BookingRequestServiceImpl implements BookingRequestService {
   @Override
   public BookingRequest getBookingRequestByBookingRequestId(String bookingRequestId) {
     return bookingRequestRepository.findByBookingRequestId(bookingRequestId);
+  }
+
+  @Override
+  public BookingStatus getStatus(String bookingRequestId) {
+    return bookingRequestRepository.findByBookingRequestId(bookingRequestId).getStatus();
   }
 
   private BookingVo getBookingVoFromBookingRequest(BookingRequest bookingRequest) {

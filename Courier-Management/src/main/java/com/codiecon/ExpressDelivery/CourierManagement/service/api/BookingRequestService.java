@@ -19,4 +19,6 @@ public interface BookingRequestService {
   void updateStatus(String bookingRequestId, BookingStatus status);
 
   BookingRequest getBookingRequestByBookingRequestId(String bookingRequestId);
+
+  BookingStatus getStatus(String bookingRequestId);
 }

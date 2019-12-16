@@ -15,6 +15,17 @@ public interface BookingResponseRepository extends JpaRepository<BookingResponse
   BookingStatus findStatusByBookingId(@Param("bookingRequestId") String bookingRequestId);
 
   @Modifying
-  @Query("UPDATE BookingResponse B SET B.status = :status WHERE B.bookingRequestId = :bookingRequestId")
-  void updateStatus(@Param("bookingRequestId") String bookingRequestId, @Param("status") BookingStatus status);
+  @Query("UPDATE BookingResponse B SET B.status = :status WHERE B.bookingRequestId = "
+             + ":bookingRequestId")
+  void updateStatus(@Param("bookingRequestId") String bookingRequestId,
+      @Param("status") BookingStatus status);
+
+  BookingResponse findByBookingRequestId(String bookingRequestId);
+
+  @Modifying
+  @Query("UPDATE BookingResponse B set B.status = :status, B.bookingCost = :cost, B.courierId = "
+             + ":courierId where B.bookingRequestId = :bookingRequestId")
+  int updateResponse(@Param("bookingRequestId") String bookingRequestId,
+      @Param("status") BookingStatus status, @Param("cost") double cost,
+      @Param("courierId") String courierId);
 }
