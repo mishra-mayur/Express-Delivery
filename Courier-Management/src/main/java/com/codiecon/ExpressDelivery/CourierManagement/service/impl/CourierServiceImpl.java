@@ -66,8 +66,7 @@ public class CourierServiceImpl implements CourierService {
   @Transactional
   public boolean updateCourierStatus(String email, CourierStatus status) {
     boolean updated = liveCourierService.updateStatus(email, status);
-    boolean updatedDone = courierRepository
-        .updateCourierStatus(email, status)==1;
+    boolean updatedDone = courierRepository.updateCourierStatus(email, status) == 1;
     return updated && updatedDone;
   }
 
@@ -119,8 +118,7 @@ public class CourierServiceImpl implements CourierService {
     try {
       fcmTokenService.deleteToken(courierId, fcmToken);
       updated = liveCourierService.updateStatus(courierId, CourierStatus.INACTIVE);
-      updatedDone = courierRepository
-          .updateCourierStatus(courierId, CourierStatus.INACTIVE)==1;
+      updatedDone = courierRepository.updateCourierStatus(courierId, CourierStatus.INACTIVE) == 1;
     } catch (Exception e) {
       return false;
     }
